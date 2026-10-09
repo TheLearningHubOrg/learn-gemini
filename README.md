@@ -1,6 +1,6 @@
 # Google Gemini: The Definitive Staff-Level Engineering Masterclass
 
-> **Exhaustive enterprise production guide to Gemini 2.0 Flash, Gemini 1.5 Pro, 2M+ long-context windows, native video/audio understanding, 85% Context Caching, Function Calling, Code Execution sandboxes, and Vertex AI enterprise deployments.**
+> **Exhaustive enterprise production guide to Gemini 3.5 Flash-Lite, Gemini 3.8 Flash, 2M+ long-context windows, native video/audio understanding, 85% Context Caching, Function Calling, Code Execution sandboxes, and Vertex AI enterprise deployments.**
 
 ---
 
@@ -39,40 +39,45 @@ flowchart TD
 
 ---
 
-### 1.2 Model Topology & The Gemini 2.0 / 1.5 Benchmark Matrix
+### 1.2 Model Topology & the Gemini 3.x Model Matrix
 
 ```mermaid
 graph TD
-    subgraph Flash2["Gemini 2.0 Flash (Next-Gen Realtime Workhorse)"]
+    subgraph Flash2["Gemini 3.5 Flash-Lite (Next-Gen Realtime Workhorse)"]
         F1["Ultra-fast sub-200ms TTFT | Native Audio-to-Audio | Multimodal Live API"]
         F2["Built-in Code Execution & Google Search Grounding"]
         F3["1,000,000 Token Context Window"]
     end
 
-    subgraph Pro15["Gemini 1.5 Pro (Massive Context Deep Research)"]
+    subgraph Pro15["Gemini 3.8 Flash (Massive Context Deep Research)"]
         P1["Massive 2,000,000 Token Context Window (Industry Record)"]
         P2["Near-perfect 99.7% Needle-in-a-Haystack across 1 hour of video"]
         P3["Deep Complex Reasoning, Architecture, and Multi-Repo Analysis"]
     end
 
-    subgraph Flash15["Gemini 1.5 Flash (High Throughput Enterprise Workhorse)"]
+    subgraph Flash15["Gemini 3.5 Flash-Lite (High Throughput Enterprise Workhorse)"]
         FL1["Cost-efficient 1M context model for high-scale ETL and summarization"]
         FL2["Full Context Caching support (85% cost reduction)"]
     end
 ```
 
-| Model Family | Context Window | Max Output | Input Cost / 1M | Output Cost / 1M | Cached Input / 1M | Best Enterprise Use Case |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`gemini-2.0-flash`** | 1,048,576 | 8,192 | $0.10 | $0.40 | $0.025 (-75%) | Real-time agentic loops, live voice/video streaming, low-latency API tasks |
-| **`gemini-1.5-pro`** | 2,097,152 | 8,192 | $1.25 ($2.50 >128k) | $5.00 ($10.00 >128k) | $0.3125 (-75%) | Full codebase ingestion, 1-hour video auditing, deep legal/financial analysis |
-| **`gemini-1.5-flash`** | 1,048,576 | 8,192 | $0.075 ($0.15 >128k) | $0.30 ($0.60 >128k) | $0.01875 (-75%) | High-throughput document OCR, multi-tenant RAG, automated classification |
-| **`gemini-2.0-flash-thinking`** | 1,048,576 | 8,192 | Preview | Preview | Preview | Complex STEM problems, multi-step code synthesis, theorem proving |
+| Model Family | Positioning | Typical Use Case |
+| :--- | :--- | :--- |
+| **`gemini-3.5-flash-lite`** | Free-tier-friendly default for day-to-day workloads | Real-time agentic loops, low-latency API tasks, high-volume summarization/classification |
+| **`gemini-3.8-flash`** | Higher-capability latest model for harder tasks | Deep architecture reviews, complex reasoning, and multimodal synthesis |
+
+> Pricing, token limits, and cache discounts change over time. Always verify the current values in official Gemini API model documentation before production rollout.
 
 ---
 
 ### 1.3 The Google GenAI SDK: Modern `google-genai` Architecture
 
 In late 2024, Google unified its developer ecosystem into the modern **`google-genai`** SDK (`from google import genai`), replacing the legacy `google-generativeai` package. The modern SDK provides a single, uniform interface across both **Google AI Studio** and **Google Cloud Vertex AI**:
+
+```bash
+pip install -U google-genai
+export GEMINI_API_KEY="your_api_key_here"
+```
 
 ```mermaid
 flowchart LR
@@ -95,7 +100,7 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 # client = genai.Client(vertexai=True, project="my-enterprise-gcp-project", location="us-central1")
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="Explain consensus in distributed databases in two concise sentences."
 )
 print(response.text)
@@ -134,7 +139,7 @@ config = types.GenerateContentConfig(
 )
 
 response = client.models.generate_content(
-    model="gemini-1.5-pro",
+    model="gemini-3.8-flash",
     contents="Audit this cloud architecture for disaster recovery compliance.",
     config=config
 )
@@ -153,7 +158,7 @@ client = genai.Client()
 
 print("Streaming Gemini generation:")
 for chunk in client.models.generate_content_stream(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="Write an asynchronous Rust actor that handles WebSocket client disconnections."
 ):
     print(chunk.text, end="", flush=True)
@@ -179,7 +184,7 @@ const ai = new GoogleGenAI({
 
 async function streamExplanation(topic: string): Promise<void> {
   const responseStream = await ai.models.generateContentStream({
-    model: "gemini-2.0-flash",
+    model: "gemini-3.5-flash-lite",
     contents: `Explain distributed consensus: ${topic}`,
     config: {
       temperature: 0.1,
@@ -198,9 +203,9 @@ streamExplanation("Raft Log Compaction & Snapshotting");
 
 ---
 
-### 1.7 Gemini 2.0 Multimodal Live API (Bidirectional WebSockets)
+### 1.7 Gemini 3.x Multimodal Live API (Bidirectional WebSockets)
 
-With Gemini 2.0, Google introduced the **Multimodal Live API**, operating over a persistent bidirectional WebSocket connection:
+With Gemini 3.x, Google introduced the **Multimodal Live API**, operating over a persistent bidirectional WebSocket connection:
 
 ```mermaid
 sequenceDiagram
@@ -210,7 +215,7 @@ sequenceDiagram
     participant AudioOut as Audio Output Device
 
     Client->>WS: Connect: wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent
-    Client->>WS: setup {model: "models/gemini-2.0-flash-exp", generation_config: {response_modalities: ["AUDIO"]}}
+    Client->>WS: setup {model: "models/gemini-3.8-flash", generation_config: {response_modalities: ["AUDIO"]}}
     
     loop Continuous Streaming
         Client->>WS: realtime_input {media_chunks: [24kHz PCM16 Audio + JPEG Video Frame]}
@@ -234,11 +239,11 @@ sequenceDiagram
 
 ### 2.1 Sizing the 2,000,000 Token Context Window
 
-Gemini 1.5 Pro broke AI history by extending the production context window to **2,097,152 tokens**. Understanding what fits inside this cognitive capacity transforms architectural paradigms:
+Gemini 3.8 Flash broke AI history by extending the production context window to **2,097,152 tokens**. Understanding what fits inside this cognitive capacity transforms architectural paradigms:
 
 ```mermaid
 flowchart TD
-    Context["2,000,000 Token Context Window in Gemini 1.5 Pro"]
+    Context["2,000,000 Token Context Window in Gemini 3.8 Flash"]
     
     Context --> C1["1. Full-Length Video: ~1 Hour of 1080p Video (at 1 FPS)"]
     Context --> C2["2. High-Fidelity Audio: ~11 Hours of Continuous Audio"]
@@ -269,7 +274,7 @@ flowchart TD
         T6 --> T7["LLM Synthesis"]
     end
 
-    subgraph ChunklessRAG["2. Chunkless RAG with Gemini 1.5 Pro (Direct Ingestion)"]
+    subgraph ChunklessRAG["2. Chunkless RAG with Gemini 3.8 Flash (Direct Ingestion)"]
         C_Docs["Entire 1,000-Page Manual / Complete Codebase"] --> FilesAPI["Upload via Google Files API"]
         FilesAPI --> Gemini2M["Ingest directly into Gemini 2M Context Window"]
         Gemini2M --> DirectAns["Comprehensive Global Synthesis with Zero Chunking Artifacts!"]
@@ -373,7 +378,7 @@ def ingest_codebase_to_gemini(repo_root: str):
     print(f"File uploaded successfully! Name: {uploaded_file.name} | URI: {uploaded_file.uri}")
 
     # Step 3: Run comprehensive architectural analysis across 2M context
-    print("Submitting architectural analysis to Gemini 1.5 Pro...")
+    print("Submitting architectural analysis to Gemini 3.8 Flash...")
     prompt = (
         "You are a principal software architect reviewing this entire repository. "
         "Perform a thorough architectural review:\n"
@@ -384,7 +389,7 @@ def ingest_codebase_to_gemini(repo_root: str):
     )
 
     response = client.models.generate_content(
-        model="gemini-1.5-pro",
+        model="gemini-3.8-flash",
         contents=[uploaded_file, prompt]
     )
 
@@ -406,14 +411,14 @@ if __name__ == "__main__":
 
 ### 3.1 The Architecture of Google Context Caching
 
-While querying a 500,000-token document or a 1-hour video is technically possible in Gemini 1.5 Pro, doing so repeatedly on every user interaction is economically unviable without caching.
+While querying a 500,000-token document or a 1-hour video is technically possible in Gemini 3.8 Flash, doing so repeatedly on every user interaction is economically unviable without caching.
 
 Google **Context Caching** allows developers to pre-compile and store the Key-Value (KV) attention states of large multimodal assets directly on Google's Cloud TPU clusters:
 
 ```mermaid
 flowchart TD
     Asset["Large Multimodal Corpus (Video, 500-page PDF, or Codebase > 32,768 tokens)"] --> Upload["1. Upload via Files API"]
-    Upload --> CreateCache["2. client.caches.create(model='gemini-1.5-pro', ttl='3600s')"]
+    Upload --> CreateCache["2. client.caches.create(model='gemini-3.8-flash', ttl='3600s')"]
     
     CreateCache --> TPUCluster["Google Cloud TPU Cluster: Computes & Pins KV Tensors in TPU HBM"]
     TPUCluster --> CacheHandle["Returns Cache Resource Handle: cachedContents/ab12cd34ef"]
@@ -434,18 +439,18 @@ flowchart TD
 
 Understanding Gemini's caching parameters is essential for financial engineering:
 
-| Parameter | Gemini 1.5 Pro | Gemini 1.5 Flash | Gemini 2.0 Flash |
-| :--- | :--- | :--- | :--- |
-| **Minimum Cacheable Tokens** | **32,768 tokens** | **32,768 tokens** | **32,768 tokens** |
-| **Uncached Input Cost / 1M** | $1.25 ($2.50 >128k) | $0.075 ($0.15 >128k) | $0.10 |
-| **Cached Input Cost / 1M** | **$0.3125 (-75%)** | **$0.01875 (-75%)** | **$0.025 (-75%)** |
-| **Default Time-To-Live (TTL)** | 1 Hour (3,600s) | 1 Hour (3,600s) | 1 Hour (3,600s) |
-| **Storage Fee / 1M tokens / hr**| $4.50 | $1.00 | $1.00 |
+| Parameter | Guidance |
+| :--- | :--- |
+| **Minimum Cacheable Tokens** | **32,768 tokens** |
+| **Default Time-To-Live (TTL)** | 1 Hour (3,600s) |
+| **Billing Behavior** | You are billed separately for cached storage and generation usage. |
+| **Cost Validation Rule** | Check current per-model pricing and cache discount rates in official Gemini docs before sizing production workloads. |
 
 #### Financial Break-Even Analysis:
 - Ingesting a **100,000-token PDF**:
-  - Uncached: Querying 20 times costs $100\text{k} \times 20 \times \$1.25/\text{M} = \mathbf{\$2.50}$.
-  - With Context Caching: Initial cache setup + 1 hour storage + 20 cached queries = $\$0.125 + \$0.45 + (20 \times \$0.03125) = \mathbf{\$1.20}$ (**$>50\%$ savings immediately, scaling to $75\%$ on higher traffic**).
+  - Compute cost with your current model's uncached input rate.
+  - Compare it against: initial cache creation + cache storage duration + repeated cached query rates.
+  - Context caching typically improves economics as repeated query count increases, but exact break-even depends on current model pricing.
 
 ---
 
@@ -519,7 +524,7 @@ def run_context_caching_pipeline():
     # Step 2: Create Explicit Context Cache
     print("3. Allocating Context Cache on Google Cloud TPU clusters...")
     cache = client.caches.create(
-        model="gemini-1.5-flash",
+        model="gemini-3.5-flash-lite",
         config=types.CreateCachedContentConfig(
             contents=[corpus_file],
             display_name="compliance_manual_cache",
@@ -533,7 +538,7 @@ def run_context_caching_pipeline():
     print("\n4. Querying Gemini using Cached Content...")
     t0 = time.time()
     response = client.models.generate_content(
-        model="gemini-1.5-flash",
+        model="gemini-3.5-flash-lite",
         contents="What is the cryptographic heartbeat quorum timeout?",
         config=types.GenerateContentConfig(
             cached_content=cache.name,
@@ -580,14 +585,14 @@ flowchart LR
     end
     
     FrameSample & AudioTrack --> Unified["Unified Temporal Attention Stream (~290 tokens/sec total)"]
-    Unified --> Gemini2M["Ingested into Gemini 1.5 Pro (Up to 1 Hour of Video!)"]
+    Unified --> Gemini2M["Ingested into Gemini 3.8 Flash (Up to 1 Hour of Video!)"]
 ```
 
 #### The Video Token Formula:
 $$\text{Tokens Per Minute} \approx (60 \times 258) + (60 \times 32) \approx \mathbf{17,400\text{ tokens / minute}}$$
 
 - A **10-minute product demo**: $\approx 174,000\text{ tokens}$.
-- A **1-hour conference lecture**: $\approx 1,044,000\text{ tokens}$ (easily fits inside Gemini 1.5 Pro's 2M window!).
+- A **1-hour conference lecture**: $\approx 1,044,000\text{ tokens}$ (easily fits inside Gemini 3.8 Flash's 2M window!).
 
 #### Temporal Grounding & Timestamp Citations
 Gemini does not merely describe video; it pinpoints exact temporal markers:
@@ -618,7 +623,7 @@ client = genai.Client()
 audio_file = client.files.upload(file="earnings_call.mp3")
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents=[
         audio_file,
         "Analyze this earnings call. At what timestamp did the CFO hesitate when answering questions about Q4 debt maturities?"
@@ -649,7 +654,7 @@ client = genai.Client()
 pdf_doc = client.files.upload(file="sec_filing_10k.pdf")
 
 response = client.models.generate_content(
-    model="gemini-1.5-pro",
+    model="gemini-3.8-flash",
     contents=[
         pdf_doc,
         "Extract the 'Consolidated Statement of Operations' table on page 42 into clean Markdown format."
@@ -694,7 +699,7 @@ client = genai.Client()
 screenshot = client.files.upload(file="dashboard_ui.png")
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents=[screenshot, "Locate all interactive navigation buttons on this screen."],
     config=types.GenerateContentConfig(
         response_mime_type="application/json",
@@ -756,14 +761,14 @@ def run_multimodal_document_pipeline():
     )
 
     # Step 2: Extract structured Pydantic data from document
-    print("2. Extracting structured financial model with Gemini 2.0 Flash...")
+    print("2. Extracting structured financial model with Gemini 3.5 Flash-Lite...")
     prompt = (
         "Analyze this earnings release. Extract the company name, fiscal year, "
         "quarterly metrics, and note any extraordinary financial gains from the footnotes."
     )
 
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-3.5-flash-lite",
         contents=[uploaded_doc, prompt],
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
@@ -795,7 +800,7 @@ Gemini models support high-speed, parallel **Function Calling**, allowing models
 sequenceDiagram
     autonumber
     actor App as Application Backend
-    participant Gemini as Gemini 2.0 Flash
+    participant Gemini as Gemini 3.5 Flash-Lite
     participant Service as Production API Service
 
     App->>Gemini: User Prompt + Registered Tools (Python Callables or JSON Schemas)
@@ -827,7 +832,7 @@ def lookup_stock_price(ticker: str) -> dict:
 client = genai.Client()
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="What is the current trading price of Alphabet (GOOGL)?",
     config={"tools": [lookup_stock_price]}
 )
@@ -846,7 +851,7 @@ One of Gemini's most powerful native superpowers is **Built-in Cloud Code Execut
 
 ```mermaid
 flowchart TD
-    User["User: 'Calculate 87th Fibonacci number and find prime factors of 2026'"] --> Gemini["Gemini 2.0 Flash"]
+    User["User: 'Calculate 87th Fibonacci number and find prime factors of 2026'"] --> Gemini["Gemini 3.5 Flash-Lite"]
     
     Gemini --> WriteCode["Gemini writes Python script to solve problem mathematically"]
     WriteCode --> Sandbox["Google Cloud Secure Sandboxed Execution Environment"]
@@ -863,7 +868,7 @@ from google.genai import types
 client = genai.Client()
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="Calculate the exact standard deviation and IQR for these values: [12.4, 15.8, 19.2, 24.1, 28.9, 31.2, 45.8, 92.1]",
     config=types.GenerateContentConfig(
         tools=[{"code_execution": {}}] # Enables native cloud sandbox execution!
@@ -891,7 +896,7 @@ To eliminate hallucinations on real-time news, live sports, or fresh documentati
 
 ```mermaid
 flowchart LR
-    UserQuery["User Prompt: 'What was the latest James Webb Space Telescope discovery yesterday?'"] --> Gemini["Gemini 2.0 Flash"]
+    UserQuery["User Prompt: 'What was the latest James Webb Space Telescope discovery yesterday?'"] --> Gemini["Gemini 3.5 Flash-Lite"]
     Gemini --> Search["Google Search Engine Grounding"]
     Search --> LiveWeb["Live Web Index Crawl & Retrieval"]
     LiveWeb --> GroundingMeta["Generates response with clickable URL citations in grounding_metadata!"]
@@ -904,7 +909,7 @@ from google.genai import types
 client = genai.Client()
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="What are the latest changes in the Python 3.14 release cycle?",
     config=types.GenerateContentConfig(
         tools=[{"google_search": {}}] # Enables real-time Google Search grounding!
@@ -943,7 +948,7 @@ class KubernetesClusterAudit(BaseModel):
 client = genai.Client()
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="Audit cluster k8s-prod-us: 3 nodes running Kubernetes v1.24 with CVE-2023-2728 unpatched.",
     config=types.GenerateContentConfig(
         response_mime_type="application/json",
@@ -993,7 +998,7 @@ def run_gemini_agent_loop(user_prompt: str):
 
     # Start conversational turn
     chat = client.chats.create(
-        model="gemini-2.0-flash",
+        model="gemini-3.5-flash-lite",
         config=types.GenerateContentConfig(
             tools=tools_list,
             temperature=0.0
@@ -1117,7 +1122,7 @@ client_prod = genai.Client(
 
 # Identical code executes seamlessly on both backends!
 response = client_prod.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="Audit financial ledger transactions."
 )
 ```
@@ -1186,7 +1191,7 @@ client = genai.Client()
 )
 def resilient_gemini_call(prompt: str) -> str:
     res = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-3.5-flash-lite",
         contents=prompt
     )
     return res.text
@@ -1235,7 +1240,7 @@ async def chat_stream_endpoint(req: ChatRequest):
             
             # Stream tokens
             for chunk in gemini_client.models.generate_content_stream(
-                model="gemini-2.0-flash",
+                model="gemini-3.5-flash-lite",
                 contents=req.prompt,
                 config=config
             ):
@@ -1268,7 +1273,8 @@ from google import genai
 from google.genai import types
 
 # AI Studio
-client = genai.Client(api_key="AIzaSy...")
+import os
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 # Vertex AI (Enterprise)
 client = genai.Client(vertexai=True, project="my-project", location="us-central1")
@@ -1283,7 +1289,7 @@ config = types.GenerateContentConfig(
 )
 
 for chunk in client.models.generate_content_stream(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="Explain RingAttention",
     config=config
 ):
@@ -1297,7 +1303,7 @@ uploaded_file = client.files.upload(file="large_manual.pdf")
 
 # 2. Create cache (requires >= 32,768 tokens)
 cache = client.caches.create(
-    model="gemini-1.5-flash",
+    model="gemini-3.5-flash-lite",
     config=types.CreateCachedContentConfig(
         contents=[uploaded_file],
         ttl="3600s",
@@ -1307,7 +1313,7 @@ cache = client.caches.create(
 
 # 3. Query with cache
 res = client.models.generate_content(
-    model="gemini-1.5-flash",
+    model="gemini-3.5-flash-lite",
     contents="Summarize section 4",
     config=types.GenerateContentConfig(cached_content=cache.name)
 )
@@ -1317,14 +1323,14 @@ res = client.models.generate_content(
 # ==========================================
 # Native Python Cloud Sandbox Execution
 code_res = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="Calculate prime numbers up to 1000",
     config=types.GenerateContentConfig(tools=[{"code_execution": {}}])
 )
 
 # Google Search Live Grounding
 search_res = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="Latest NASA Mars discovery",
     config=types.GenerateContentConfig(tools=[{"google_search": {}}])
 )
@@ -1339,7 +1345,7 @@ class OutputSchema(BaseModel):
     risk_level: str
 
 structured_res = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     contents="Audit log entry",
     config=types.GenerateContentConfig(
         response_mime_type="application/json",
@@ -1355,14 +1361,14 @@ structured_res = client.models.generate_content(
 #### 1. How does Google Gemini's native multimodal architecture fundamentally differ from pipeline-based multimodal models?
 Traditional multimodal systems retrofit a pre-trained text LLM with external cross-attention projection layers connected to separate vision models (e.g. CLIP) and speech models (e.g. Whisper). This creates distinct translation bottlenecks and information loss. Gemini was trained natively from Day 0 on a mixture of text, code, audio waveforms, video frames, and document layout pixels in a single unified transformer architecture. This enables cross-modal temporal reasoning (e.g. correlating visual frame changes with subtle acoustic pitch shifts) and preserves spatial layout comprehension without external OCR.
 
-#### 2. What is RingAttention, and how does it enable Gemini 1.5 Pro's 2,000,000-token context window?
+#### 2. What is RingAttention, and how does it enable Gemini 3.8 Flash's 2,000,000-token context window?
 Standard self-attention requires $O(N^2)$ memory, which exhausts GPU/TPU memory on sequences beyond 100k tokens. RingAttention partitions the 2M-token sequence across a physical ring of TPU v5e/v5p chips. While Query tensors remain local to each chip, Key and Value tensors circulate continuously around the optical ring network. By overlapping tensor communication with attention computation, RingAttention scales context length near-linearly with the number of chips, achieving $>99.7\%$ retrieval accuracy across millions of tokens.
 
 #### 3. What are the economic and operational rules of Gemini Context Caching?
-Context Caching allows developers to persist precomputed Key-Value attention tensors on Google Cloud TPU clusters. It requires a minimum token threshold of **32,768 tokens**. Caches default to a **1-hour TTL** (configurable in seconds/hours and dynamically updatable). In exchange for a small hourly storage fee ($1-$4.50/M tokens/hr), cached input queries receive a **75% to 85% discount** ($0.3125/M vs $1.25/M on 1.5 Pro), and Time to First Token (TTFT) drops from over 10 seconds down to under 800 milliseconds.
+Context Caching allows developers to persist precomputed Key-Value attention tensors on Google Cloud TPU clusters. It requires a minimum token threshold of **32,768 tokens** and defaults to a **1-hour TTL** (configurable). Caching usually lowers repeated-query latency and can reduce total cost for multi-turn workloads, but discount percentages and storage rates vary by model and date. Always validate the latest pricing and cache policies before launch.
 
 #### 4. How does Gemini calculate token consumption for video files?
-Gemini samples video at a default rate of **1 frame per second (1 FPS)**. Each sampled video frame consumes approximately **258 tokens**, while the accompanying audio track consumes approximately **32 tokens per second**. In total, one minute of video consumes approximately $60 \times (258 + 32) \approx \mathbf{17,400\text{ tokens}}$. A full 1-hour 1080p video consumes approximately 1,044,000 tokens, fitting comfortably inside Gemini 1.5 Pro's 2M window.
+Gemini samples video at a default rate of **1 frame per second (1 FPS)**. Each sampled video frame consumes approximately **258 tokens**, while the accompanying audio track consumes approximately **32 tokens per second**. In total, one minute of video consumes approximately $60 \times (258 + 32) \approx \mathbf{17,400\text{ tokens}}$. A full 1-hour 1080p video consumes approximately 1,044,000 tokens, fitting comfortably inside Gemini 3.8 Flash's 2M window.
 
 #### 5. When should an enterprise use "Chunkless RAG" instead of traditional Vector Database RAG?
 Traditional Vector RAG is required when the corpus exceeds 10M-100M+ tokens or spans millions of disparate documents where cost per search must remain negligible. Chunkless RAG (ingesting entire 500-page documents, complete books, or multi-repository codebases directly into Gemini's 2M context window) is superior when deep cross-document synthesis, global thematic summarization, or complex multi-hop dependency tracing is required, eliminating chunking boundary errors and vector similarity retrieval gaps.
@@ -1393,8 +1399,8 @@ While AI Studio is designed for developer experimentation using simple API keys,
 #### 12. What is the Google Files API, and why should it be used over inline base64 data?
 The Files API (`client.files.upload`) uploads large multimodal assets (up to 2GB per file) to Google Cloud infrastructure once, assigning them a persistent URI. Files are hosted **free of charge for 48 hours**. Using the Files API avoids inflating JSON payload sizes, prevents HTTP timeout errors, and allows the same file to be referenced across multiple generation requests and Context Caches.
 
-#### 13. What is the difference between Gemini 2.0 Flash and Gemini 2.0 Flash Thinking?
-Gemini 2.0 Flash is an ultra-fast multimodal model optimized for real-time applications, low latency, and tool orchestration. Gemini 2.0 Flash Thinking incorporates *test-time compute*, generating explicit internal reasoning steps before emitting the visible answer, significantly improving accuracy on complex STEM, mathematical proofs, and competitive coding tasks.
+#### 13. What is the difference between Gemini 3.5 Flash-Lite and Gemini 3.8 Flash?
+Gemini 3.5 Flash-Lite is an ultra-fast multimodal model optimized for real-time applications, low latency, and tool orchestration. Gemini 3.8 Flash incorporates *test-time compute*, generating explicit internal reasoning steps before emitting the visible answer, significantly improving accuracy on complex STEM, mathematical proofs, and competitive coding tasks.
 
 #### 14. How does Gemini handle multi-speaker audio files natively?
 Gemini ingests raw audio waveforms directly. Because acoustic timbres and pitch inflections are retained in the neural representations, Gemini can perform native speaker diarization (differentiating Speaker 1 from Speaker 2), detect vocal emotions (stress, hesitation, sarcasm), and identify background acoustic events (glass shattering, sirens, machinery) without requiring external speech models.
@@ -1405,7 +1411,7 @@ The minimum requirement is **32,768 tokens**. Attempting to call `client.caches.
 #### 16. How do you extend the lifespan of an active Context Cache dynamically?
 Call `client.caches.update(name=cache.name, config=types.UpdateCachedContentConfig(ttl="7200s"))`. This resets the cache expiration time, allowing long-running enterprise chat sessions to keep the cache warm without re-uploading the corpus.
 
-#### 17. How does Gemini 1.5 Pro process complex multi-page PDF documents?
+#### 17. How does Gemini 3.8 Flash process complex multi-page PDF documents?
 Gemini renders each PDF page visually at **258 tokens per page**. Because it "sees" the document visually rather than relying on plain-text OCR, it accurately parses multi-column layouts, charts, footnotes, handwriting, and complex nested financial tables without column interleaving errors.
 
 #### 18. What are the four core safety categories in Gemini?
@@ -1425,14 +1431,14 @@ The SDK can inspect native Python function signatures, type hints, and docstring
 - `ANY`: The model is forced to call at least one function from the provided list.
 - `NONE`: Disables function calling, forcing the model to respond with text only.
 
-#### 22. What is the maximum output token limit of Gemini 2.0 Flash?
-Gemini 2.0 Flash supports up to **8,192 output tokens** per generation.
+#### 22. What is the maximum output token limit of Gemini 3.5 Flash-Lite?
+Gemini 3.5 Flash-Lite supports up to **8,192 output tokens** per generation.
 
 #### 23. How do you implement streaming with Gemini using Server-Sent Events (SSE) in FastAPI?
 Iterate over `client.models.generate_content_stream(...)` inside an asynchronous generator function. Yield each chunk as formatted SSE data (`f"data: {chunk.text}\n\n"`), and wrap the generator in a FastAPI `StreamingResponse(media_type="text/event-stream")`.
 
-#### 24. What is the pricing difference between Gemini 1.5 Flash and Gemini 1.5 Pro?
-Gemini 1.5 Flash is designed for high-volume efficiency at **$0.075 / 1M input tokens** ($0.15 for prompts >128k). Gemini 1.5 Pro is designed for maximum intelligence at **$1.25 / 1M input tokens** ($2.50 for prompts >128k). Flash is roughly 16x cheaper than Pro.
+#### 24. What is the pricing difference between Gemini 3.5 Flash-Lite and Gemini 3.8 Flash?
+Gemini 3.5 Flash-Lite is generally positioned for high-volume efficiency, while Gemini 3.8 Flash is positioned for higher-capability reasoning and synthesis. Exact token rates change; verify current pricing directly from official Gemini API pricing pages before budgeting.
 
 #### 25. How does Gemini's audio processing token rate compare to its video token rate?
 Audio consumes approximately **32 tokens per second** (~1,920 tokens/minute). Video (at 1 FPS) consumes approximately **258 tokens per second** (~15,480 tokens/minute). Video is roughly 8x more token-intensive than audio.
@@ -1458,8 +1464,8 @@ Yes. When creating a cache via `client.caches.create()`, developers can include 
 #### 32. How does Gemini ensure determinism in code generation?
 Set `temperature=0.0` and fix `top_k=1` in `GenerateContentConfig`. This forces greedy token selection, delivering deterministic reproduction of generated code across identical prompts.
 
-#### 33. What is the Multimodal Live API in Gemini 2.0?
-The Multimodal Live API provides low-latency, bidirectional streaming over WebSockets, enabling real-time voice and video conversations directly with Gemini 2.0 Flash with sub-300ms speech-to-speech latency.
+#### 33. What is the Multimodal Live API in Gemini 3.x?
+The Multimodal Live API provides low-latency, bidirectional streaming over WebSockets, enabling real-time voice and video conversations directly with Gemini 3.5 Flash-Lite with sub-300ms speech-to-speech latency.
 
 #### 34. What is the maximum file size supported by the Google Files API?
 The Files API supports files up to **2GB** per upload, with an aggregate project storage quota of 20GB.
@@ -1500,7 +1506,7 @@ The cached KV tensors are evicted from TPU memory, and the cache handle is delet
 `stop_sequences` defines an array of string tokens that immediately halt generation when encountered (e.g. `["\n\nUser:", "### END ###"]`), preventing the model from continuing to generate conversational turns or extraneous text.
 
 #### 46. How does Gemini compare to Claude 3.5 Sonnet in context window capacity?
-Gemini 1.5 Pro features a **2,097,152 token** context window, which is more than **10x larger** than Claude 3.5 Sonnet's 200,000-token context window.
+Gemini 3.8 Flash features a **2,097,152 token** context window, which is more than **10x larger** than Claude 3.5 Sonnet's 200,000-token context window.
 
 #### 47. What is the role of `HarmBlockThreshold.BLOCK_LOW_AND_ABOVE`?
 It represents the most conservative safety threshold, blocking any generation that has even a slight or low probability of containing harmful content, mandatory for public educational portals.
@@ -1512,8 +1518,8 @@ Instead of passing a Python function, pass a `types.Tool` object containing `fun
 Inspect `response.usage_metadata`, which contains `prompt_token_count`, `candidates_token_count`, and `total_token_count`. If Context Caching was used, it also reports `cached_content_token_count`.
 
 #### 50. What is the ultimate production architectural recommendation for building enterprise systems on Google Gemini?
-1. Use **Gemini 2.0 Flash** for low-latency, real-time agentic workflows and tool execution loops.
-2. Deploy **Gemini 1.5 Pro** for massive codebase auditing, 1-hour video ingestion, and complex document synthesis.
+1. Use **Gemini 3.5 Flash-Lite** for low-latency, real-time agentic workflows and tool execution loops.
+2. Deploy **Gemini 3.8 Flash** for massive codebase auditing, 1-hour video ingestion, and complex document synthesis.
 3. Ingest documents and media through the **Google Files API** to avoid payload overhead.
 4. Apply **Context Caching** on all multi-turn assets exceeding 32k tokens for an immediate 85% cost reduction.
 5. Enable **Native Code Execution** for mathematical and tabular data verification.
